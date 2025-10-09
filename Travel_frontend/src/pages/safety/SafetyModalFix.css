@@ -1,0 +1,89 @@
+/* Additional Modal Fixes for Better Scrolling and Visibility */
+
+/* Ensure modal overlay allows scrolling */
+.modal-overlay {
+  overflow-y: auto !important;
+  align-items: flex-start !important;
+  padding-top: 2rem !important;
+  padding-bottom: 2rem !important;
+}
+
+/* Fix modal content to allow proper scrolling */
+.modal-content {
+  margin: auto !important;
+  max-height: none !important;
+  min-height: auto !important;
+}
+
+/* Ensure form content is fully visible */
+.safety-form {
+  min-height: auto !important;
+  padding-bottom: 2rem !important;
+}
+
+/* Make sure submit button is always visible */
+.safety-form .submit-btn {
+  position: relative !important;
+  z-index: 1 !important;
+  margin-top: 2rem !important;
+  margin-bottom: 1rem !important;
+}
+
+/* Fix for vaccination list view */
+.vaccination-list-view {
+  max-height: none !important;
+  overflow-y: visible !important;
+}
+
+/* Ensure records list scrolls properly */
+.records-list {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+/* Custom scrollbar for better UX */
+.records-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.records-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.records-list::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+.records-list::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Ensure form groups have proper spacing */
+.safety-form .form-group {
+  margin-bottom: 1.5rem !important;
+}
+
+.safety-form .form-row {
+  margin-bottom: 1.5rem !important;
+}
+
+/* Fix for file input visibility */
+.safety-form input[type="file"] {
+  padding: 0.75rem !important;
+  border: 2px dashed #ddd !important;
+  background: #f9f9f9 !important;
+}
+
+/* Ensure textarea is visible */
+.safety-form textarea {
+  min-height: 80px !important;
+  resize: vertical !important;
+}
+
+/* Back to list button spacing */
+.back-to-list-btn {
+  margin-bottom: 1.5rem !important;
+}
