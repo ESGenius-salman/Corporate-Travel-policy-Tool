@@ -1,12 +1,12 @@
-import { DataTypes } from "sequelize";
-import { sequelize } from "../index.js";
+const { DataTypes } = require("sequelize");
+const sequelize = require("../../config/db");
 
 const EmergencyContact = sequelize.define("EmergencyContact", {
-  employeeId: { type: DataTypes.STRING, allowNull: false },
-  contactName: { type: DataTypes.STRING, allowNull: false },
-  relationship: { type: DataTypes.STRING },
-  phoneNumber: { type: DataTypes.STRING, allowNull: false },
+  name: { type: DataTypes.STRING, allowNull: false },
+  phone: { type: DataTypes.STRING, allowNull: false },
   email: { type: DataTypes.STRING },
+  country: { type: DataTypes.STRING },
+  type: { type: DataTypes.STRING }, // e.g., hospital, police, embassy
 });
 
-export default EmergencyContact;
+module.exports = EmergencyContact;

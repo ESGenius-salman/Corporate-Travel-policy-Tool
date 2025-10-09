@@ -1,4 +1,3 @@
-// controllers/healthSafetyController.js
 const {
   TravelInsurance,
   VaccinationVerification,
@@ -6,6 +5,7 @@ const {
   EmergencyContact,
   EmbassyDetail,
 } = require("../modules");
+ // << must match the path
 
 // ========== Travel Insurance ==========
 exports.getAllTravelInsurance = async (req, res) => {
@@ -16,6 +16,7 @@ exports.getAllTravelInsurance = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+console.log(TravelInsurance, VaccinationVerification);
 
 exports.addTravelInsurance = async (req, res) => {
   try {

@@ -1,11 +1,10 @@
-import { DataTypes } from "sequelize";
-import { sequelize } from "../index.js";
+const { DataTypes } = require("sequelize");
+const sequelize = require("../../config/db");
 
 const CovidHealthGuideline = sequelize.define("CovidHealthGuideline", {
-  guidelineTitle: { type: DataTypes.STRING, allowNull: false },
-  description: { type: DataTypes.TEXT },
-  applicableRegions: { type: DataTypes.ARRAY(DataTypes.STRING) },
-  lastUpdated: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
+  title: { type: DataTypes.STRING, allowNull: false },
+  description: { type: DataTypes.TEXT, allowNull: false },
+  country: { type: DataTypes.STRING, allowNull: false },
 });
 
-export default CovidHealthGuideline;
+module.exports = CovidHealthGuideline;

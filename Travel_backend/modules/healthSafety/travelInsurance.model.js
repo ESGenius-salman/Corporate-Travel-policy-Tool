@@ -1,12 +1,12 @@
-import { DataTypes } from "sequelize";
-import { sequelize } from "../index.js";
+const { DataTypes } = require("sequelize");
+const sequelize = require("../../config/db");
 
 const TravelInsurance = sequelize.define("TravelInsurance", {
-  employeeId: { type: DataTypes.STRING, allowNull: false },
-  insuranceProvider: { type: DataTypes.STRING, allowNull: false },
+  travelId: { type: DataTypes.INTEGER, allowNull: false },
+  provider: { type: DataTypes.STRING, allowNull: false },
   policyNumber: { type: DataTypes.STRING, allowNull: false },
-  coverageDetails: { type: DataTypes.TEXT },
-  validTill: { type: DataTypes.DATE, allowNull: false },
+  startDate: { type: DataTypes.DATE, allowNull: false },
+  endDate: { type: DataTypes.DATE, allowNull: false },
 });
 
-export default TravelInsurance;
+module.exports = TravelInsurance;
