@@ -1,7 +1,5 @@
-// routes/healthSafetyRoutes.js
 const express = require("express");
 const router = express.Router();
-
 const {
   getAllTravelInsurance,
   addTravelInsurance,
@@ -15,25 +13,24 @@ const {
   addEmbassyDetail,
 } = require("../controllers/healthSafetyController");
 
-// ✅ Travel Insurance
+// Travel Insurance
 router.get("/travel-insurance", getAllTravelInsurance);
 router.post("/travel-insurance", addTravelInsurance);
 
-// ✅ Vaccination Verification
+// Vaccinations
 router.get("/vaccinations", getAllVaccinations);
 router.post("/vaccinations", addVaccinationRecord);
 
-// ✅ Covid Health Guidelines
+// COVID Guidelines
 router.get("/covid-guidelines", getAllCovidGuidelines);
 router.post("/covid-guidelines", addCovidGuideline);
 
-// ✅ Emergency Contacts
+// Emergency Contacts
 router.get("/emergency-contacts", getAllEmergencyContacts);
 router.post("/emergency-contacts", addEmergencyContact);
 
-// ✅ Embassy Details
+// Embassies
 router.get("/embassies", getAllEmbassies);
 router.post("/embassies", addEmbassyDetail);
 
-// ✅ Export router (important!)
 module.exports = router;

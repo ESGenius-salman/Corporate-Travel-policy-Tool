@@ -5,34 +5,35 @@ const {
   EmergencyContact,
   EmbassyDetail,
 } = require("../modules");
- // << must match the path
 
-// ========== Travel Insurance ==========
+// --------- Travel Insurance ---------
 exports.getAllTravelInsurance = async (req, res) => {
   try {
     const data = await TravelInsurance.findAll();
     res.json(data);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 };
-console.log(TravelInsurance, VaccinationVerification);
 
 exports.addTravelInsurance = async (req, res) => {
   try {
     const insurance = await TravelInsurance.create(req.body);
-    res.json(insurance);
+    res.status(201).json(insurance);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 };
 
-// ========== Vaccination Verification ==========
+// --------- Vaccinations ---------
 exports.getAllVaccinations = async (req, res) => {
   try {
     const data = await VaccinationVerification.findAll();
     res.json(data);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 };
@@ -40,18 +41,20 @@ exports.getAllVaccinations = async (req, res) => {
 exports.addVaccinationRecord = async (req, res) => {
   try {
     const record = await VaccinationVerification.create(req.body);
-    res.json(record);
+    res.status(201).json(record);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 };
 
-// ========== COVID Health Guidelines ==========
+// --------- COVID Guidelines ---------
 exports.getAllCovidGuidelines = async (req, res) => {
   try {
     const data = await CovidHealthGuideline.findAll();
     res.json(data);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 };
@@ -59,18 +62,20 @@ exports.getAllCovidGuidelines = async (req, res) => {
 exports.addCovidGuideline = async (req, res) => {
   try {
     const record = await CovidHealthGuideline.create(req.body);
-    res.json(record);
+    res.status(201).json(record);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 };
 
-// ========== Emergency Contacts ==========
+// --------- Emergency Contacts ---------
 exports.getAllEmergencyContacts = async (req, res) => {
   try {
     const data = await EmergencyContact.findAll();
     res.json(data);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 };
@@ -78,18 +83,20 @@ exports.getAllEmergencyContacts = async (req, res) => {
 exports.addEmergencyContact = async (req, res) => {
   try {
     const contact = await EmergencyContact.create(req.body);
-    res.json(contact);
+    res.status(201).json(contact);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 };
 
-// ========== Embassy Details ==========
+// --------- Embassies ---------
 exports.getAllEmbassies = async (req, res) => {
   try {
     const data = await EmbassyDetail.findAll();
     res.json(data);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 };
@@ -97,8 +104,9 @@ exports.getAllEmbassies = async (req, res) => {
 exports.addEmbassyDetail = async (req, res) => {
   try {
     const record = await EmbassyDetail.create(req.body);
-    res.json(record);
+    res.status(201).json(record);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 };
