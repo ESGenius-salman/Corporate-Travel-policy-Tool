@@ -22,6 +22,7 @@ const SafetyCompliance = () => {
             className="btn-primary"
             onClick={() => navigate('/risk-rating-details')}
           >
+
             View Details
           </button>
         </div>
