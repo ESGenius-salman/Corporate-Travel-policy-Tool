@@ -2,13 +2,22 @@ const express = require("express");
 const router = express.Router();
 const safetyController = require("../controllers/safetyController");
 
-// Send alert / push notification
-router.post("/alert", safetyController.createAlert);
+// Alerts
+router.post("/alerts", safetyController.createAlert);
 
-// Employee check-in
-router.post("/checkin", safetyController.checkIn);
+// Check-ins
+router.post("/check-in", safetyController.checkIn);
 
-// Upload documents
-router.post("/document", safetyController.uploadDocument);
+// Documents
+router.post("/documents", safetyController.uploadDocument);
+
+// Risk Ratings
+router.post("/risk", safetyController.createRisk);
+
+// Emergency Contacts
+router.post("/emergency", safetyController.createEmergency);
+
+// Travel Insurance
+router.post("/travel-insurance", safetyController.createTravelInsurance);
 
 module.exports = router;
