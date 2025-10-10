@@ -1,8 +1,8 @@
 require("dotenv").config();
-require("./modules");
 const express = require("express");
 const sequelize = require("./config/db");
 const cors = require("cors");
+const path = require("path");
 
 const app = express();
 app.use(express.json());
@@ -15,16 +15,20 @@ app.use(
   })
 );
 
+// ✅ Import only existing models manually (optional)
+// ⚠️ REMOVE this line below because it tries to load deleted modules
+// require("./modules");
+
 // ✅ API Routes
-app.use("/api/travel", require("./routes/travelRoutes"));
+// app.use("/api/travel", require("./routes/travelRoutes"));
 app.use("/api/policy", require("./routes/policyRoutes"));
 app.use("/api/approval", require("./routes/approvalRoutes"));
 app.use("/api/safety", require("./routes/safetyRoutes"));
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/documents", require("./routes/documentRoutes"));
 
-// ✅ New Health & Safety Route
-app.use("/api/healthsafety", require("./routes/healthSafetyRoutes"));
+// ✅ Health & Safety route removed — no need to load
+// app.use("/api/healthsafety", require("./routes/healthSafetyRoutes"));
 
 // Serve login page at root
 app.get("/", (req, res) => {

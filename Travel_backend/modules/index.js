@@ -1,13 +1,16 @@
-const TravelInsurance = require("./healthSafety/travelInsurance.model");
-const VaccinationVerification = require("./healthSafety/vaccinationVerification.model");
-const CovidHealthGuideline = require("./healthSafety/covidHealthGuidelines.model");
-const EmergencyContact = require("./healthSafety/emergencyContact.model");
-const EmbassyDetail = require("./healthSafety/embassyDetails.model");
+
+// modules/index.js
+
+const safety = {
+    alert: require("./safety/alert.model"),
+    document: require("./safety/document.model")
+};
+
+const travel = require("./travel/travel.model");
+const policy = require("./policy/policy.model");
 
 module.exports = {
-  TravelInsurance,
-  VaccinationVerification,
-  CovidHealthGuideline,
-  EmergencyContact,
-  EmbassyDetail,
+    safety,
+    travel,
+    policy
 };
