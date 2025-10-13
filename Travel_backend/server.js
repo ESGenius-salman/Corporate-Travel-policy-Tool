@@ -33,8 +33,10 @@ app.use("/api/safety/alerts", require("./routes/alertRoutes"));     // Alerts CR
 app.use("/api/safety/checkin", require("./routes/checkinRoutes"));  // Geo-tracking check-ins
 app.use("/api/safety/sos", require("./routes/sosRoutes"));          // Emergency SOS
 
-// ❌ Old route removed (merged into safety module)
-// app.use("/api/healthsafety", require("./routes/healthSafetyRoutes"));
+// ✅ Simple health check route (to verify server status)
+app.get("/api/healthcheck", (req, res) => {
+  res.status(200).json({ status: "ok", message: "Server is healthy 🚀" });
+});
 
 // ✅ Serve static login page (optional)
 app.get("/", (req, res) => {
