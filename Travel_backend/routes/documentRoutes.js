@@ -1,20 +1,26 @@
 const express = require("express");
-const upload = require("../middleware/uploadMiddleware");
-const { uploadDocument, getDocumentsByTravel, getAllDocuments, checkExpiryDocuments } = require("../controllers/documentController");
-const { authMiddleware, roleMiddleware } = require("../middleware/authMiddleware");
-
 const router = express.Router();
+const multer = require("multer");
+const path = require("path");
+const {
+  getDocumentsByEmployee,
+  uploadDocument,
+  updateDocument,
+} = require("../controllers/documentController");
 
-// Employee uploads doc (supports file or manual fileUrl)
-router.post("/", authMiddleware, roleMiddleware(["employee"]), upload.single("file"), uploadDocument);
+// Multer file upload config
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, "uploads/"),
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
 
-// Employee views docs for their travel
-router.get("/:travelId", authMiddleware, roleMiddleware(["employee"]), getDocumentsByTravel);
+const upload = multer({ storage });
 
-// Admin/Manager views all docs
-router.get("/", authMiddleware, roleMiddleware(["admin", "manager"]), getAllDocuments);
-
-// Admin runs expiry check
-router.post("/check-expiry", authMiddleware, roleMiddleware(["admin"]), checkExpiryDocuments);
+// Routes
+router.get("/:employeeId", getDocumentsByEmployee);
+router.post("/upload", upload.single("file"), uploadDocument);
+router.put("/:id", updateDocument);
 
 module.exports = router;

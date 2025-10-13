@@ -2,10 +2,12 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../../config/db");
 
 const Document = sequelize.define("Document", {
-  travelId: { type: DataTypes.INTEGER, allowNull: false },
+ employeeId: { type: DataTypes.INTEGER, allowNull: true }, // allow nulls
   type: { type: DataTypes.STRING, allowNull: false },
-  fileUrl: { type: DataTypes.STRING, allowNull: false },
-  expiryDate: { type: DataTypes.DATEONLY },
+  status: { type: DataTypes.STRING },
+  expiry: { type: DataTypes.DATEONLY },
+  details: { type: DataTypes.TEXT },
+  fileUrl: { type: DataTypes.STRING },
 });
 
 module.exports = Document;
