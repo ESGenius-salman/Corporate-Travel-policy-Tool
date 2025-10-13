@@ -7,18 +7,25 @@ const admin = require("../config/firebase");
 
 // Helper: validate required fields
 const validateFields = (obj, fields) => {
-  const missing = fields.filter(f => obj[f] === undefined || obj[f] === null);
+  const missing = fields.filter(f => obj[f] === undefined || obj[f] === null || obj[f] === "");
   return missing.length ? missing : null;
 };
 
-// Create alert & send push notification
+// =======================
+// ALERTS
+// =======================
 exports.createAlert = async (req, res) => {
   try {
     const { travelId, alertType, message, fcmToken } = req.body;
     const missing = validateFields(req.body, ["travelId", "alertType", "message"]);
     if (missing) return res.status(400).json({ error: `Missing required fields: ${missing.join(", ")}` });
 
-    const alert = await Alert.create({ travelId, alertType, message, notified: !!fcmToken });
+    const alert = await Alert.create({
+      travelId,
+      alertType,
+      message,
+      notified: !!fcmToken
+    });
 
     if (fcmToken) {
       try {
@@ -30,6 +37,7 @@ exports.createAlert = async (req, res) => {
         console.error("FCM Error:", fcmErr);
       }
     }
+
     res.status(201).json(alert);
   } catch (err) {
     console.error("Sequelize Error:", err);
@@ -37,7 +45,9 @@ exports.createAlert = async (req, res) => {
   }
 };
 
-// Employee check-in for high-risk areas
+// =======================
+// CHECK-IN
+// =======================
 exports.checkIn = async (req, res) => {
   try {
     const { travelId, latitude, longitude } = req.body;
@@ -54,14 +64,22 @@ exports.checkIn = async (req, res) => {
   }
 };
 
-// Upload travel documents
+// =======================
+// DOCUMENTS
+// =======================
 exports.uploadDocument = async (req, res) => {
   try {
     const { travelId, type, fileUrl, expiryDate } = req.body;
     const missing = validateFields(req.body, ["travelId", "type", "fileUrl"]);
     if (missing) return res.status(400).json({ error: `Missing required fields: ${missing.join(", ")}` });
 
-    const doc = await Document.create({ travelId, type, fileUrl, expiryDate: expiryDate || null });
+    const doc = await Document.create({
+      travelId,
+      type,
+      fileUrl,
+      expiryDate: expiryDate || null
+    });
+
     res.status(201).json(doc);
   } catch (err) {
     console.error("Sequelize Error:", err);
@@ -69,14 +87,24 @@ exports.uploadDocument = async (req, res) => {
   }
 };
 
-// Create Risk rating
+// =======================
+// RISK RATINGS
+// =======================
 exports.createRisk = async (req, res) => {
   try {
-    const { travelId, level, description } = req.body;
-    const missing = validateFields(req.body, ["travelId", "level", "description"]);
+    const { travelId, country, city, level, description, date } = req.body;
+    const missing = validateFields(req.body, ["travelId", "country", "level", "description"]);
     if (missing) return res.status(400).json({ error: `Missing required fields: ${missing.join(", ")}` });
 
-    const risk = await Risk.create({ travelId, level, description });
+    const risk = await Risk.create({
+      travelId,
+      country,
+      city: city || "",
+      level,
+      description,
+      date: date || new Date()
+    });
+
     res.status(201).json(risk);
   } catch (err) {
     console.error("Sequelize Error:", err);
@@ -84,14 +112,26 @@ exports.createRisk = async (req, res) => {
   }
 };
 
-// Create Emergency contact
+exports.getRisks = async (req, res) => {
+  try {
+    const risks = await Risk.findAll();
+    res.status(200).json(risks);
+  } catch (err) {
+    console.error("Sequelize Error:", err);
+    res.status(500).json({ error: "Failed to fetch risks" });
+  }
+};
+
+// =======================
+// EMERGENCY CONTACTS
+// =======================
 exports.createEmergency = async (req, res) => {
   try {
     const { travelId, contactName, contactNumber, instructions } = req.body;
     const missing = validateFields(req.body, ["travelId", "contactName", "contactNumber"]);
     if (missing) return res.status(400).json({ error: `Missing required fields: ${missing.join(", ")}` });
 
-    const emergency = await Emergency.create({ travelId, contactName, contactNumber, instructions });
+    const emergency = await Emergency.create({ travelId, contactName, contactNumber, instructions: instructions || "" });
     res.status(201).json(emergency);
   } catch (err) {
     console.error("Sequelize Error:", err);
@@ -99,14 +139,23 @@ exports.createEmergency = async (req, res) => {
   }
 };
 
-// Create Travel Insurance record
+// =======================
+// TRAVEL INSURANCE
+// =======================
 exports.createTravelInsurance = async (req, res) => {
   try {
     const { travelId, provider, policyNumber, coverage, expiryDate } = req.body;
     const missing = validateFields(req.body, ["travelId", "provider", "policyNumber"]);
     if (missing) return res.status(400).json({ error: `Missing required fields: ${missing.join(", ")}` });
 
-    const insurance = await TravelInsurance.create({ travelId, provider, policyNumber, coverage, expiryDate });
+    const insurance = await TravelInsurance.create({
+      travelId,
+      provider,
+      policyNumber,
+      coverage: coverage || "",
+      expiryDate: expiryDate || null
+    });
+
     res.status(201).json(insurance);
   } catch (err) {
     console.error("Sequelize Error:", err);
