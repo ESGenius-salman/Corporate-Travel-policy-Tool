@@ -6,6 +6,7 @@ import './EmergencyContacts.css';
 const EmergencyContacts = () => {
   const navigate = useNavigate();
   const [savedEntries, setSavedEntries] = useState([]);
+  const [defaultContacts, setDefaultContacts] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
   const [formData, setFormData] = useState({
@@ -22,10 +23,25 @@ const EmergencyContacts = () => {
     notes: '',
   });
 
+  // Load saved user contacts + default emergency contacts
   useEffect(() => {
     const saved = localStorage.getItem('emergencyContactsEntries');
-    if (saved) {
-      setSavedEntries(JSON.parse(saved));
+    if (saved) setSavedEntries(JSON.parse(saved));
+
+    // Load default contacts (either from backend or config file)
+    const defaults = localStorage.getItem('defaultEmergencyContacts');
+    if (defaults) {
+      setDefaultContacts(JSON.parse(defaults));
+    } else {
+      // You can replace this with a backend fetch call
+      const defaultData = [
+        { name: 'Police', number: '100', icon: '📞' },
+        { name: 'Ambulance', number: '101', icon: '🚑' },
+        { name: 'Fire Brigade', number: '102', icon: '🔥' },
+        { name: 'Emergency Helpline', number: '112', icon: '🆘' },
+      ];
+      setDefaultContacts(defaultData);
+      localStorage.setItem('defaultEmergencyContacts', JSON.stringify(defaultData));
     }
   }, []);
 
@@ -89,15 +105,19 @@ const EmergencyContacts = () => {
         <p>Manage your emergency contacts for quick assistance during travel</p>
       </div>
 
-      <div className="default-contacts-box">
-        <h3>Default Emergency Numbers:</h3>
-        <div className="default-grid">
-          <div className="default-item">📞 Police: 100</div>
-          <div className="default-item">🚑 Ambulance: 101</div>
-          <div className="default-item">🔥 Fire Brigade: 102</div>
-          <div className="default-item">🆘 Emergency Helpline: 112</div>
+      {/* Default Emergency Contacts (dynamic now) */}
+      {defaultContacts.length > 0 && (
+        <div className="default-contacts-box">
+          <h3>Default Emergency Numbers:</h3>
+          <div className="default-grid">
+            {defaultContacts.map((contact, index) => (
+              <div key={index} className="default-item">
+                {contact.icon} {contact.name}: {contact.number}
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="stats-bar">
         <div className="stat-item">

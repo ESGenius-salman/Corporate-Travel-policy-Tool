@@ -1,17 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ComposableMap, Geographies, Geography } from 'react-simple-maps';
 import './RiskRatingDetails.css';
 
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
-
-const initialRiskData = [
-  { country: 'Japan', city: 'Tokyo', level: 'Low', description: 'Safe travel zone', date: 'Oct 2025' },
-  { country: 'India', city: 'Delhi', level: 'Medium', description: 'Air quality concern', date: 'Oct 2025' },
-  { country: 'Hong Kong', city: '', level: 'High', description: 'Political unrest', date: 'Oct 2025' },
-  { country: 'Singapore', city: '', level: 'Low', description: 'General safety', date: 'Oct 2025' },
-  { country: 'France', city: 'Paris', level: 'Medium', description: 'Protest activity', date: 'Oct 2025' },
-  { country: 'Egypt', city: 'Cairo', level: 'High', description: 'Travel only if essential', date: 'Oct 2025' },
-];
 
 const levelColors = {
   Low: '#4caf50',
@@ -30,7 +21,12 @@ function countByLevel(data, level) {
 }
 
 const RiskRatingDetails = () => {
-  const [riskData, setRiskData] = useState(initialRiskData);
+  // Load from localStorage or start empty
+  const [riskData, setRiskData] = useState(() => {
+    const savedData = localStorage.getItem('riskData');
+    return savedData ? JSON.parse(savedData) : [];
+  });
+
   const [filter, setFilter] = useState('All');
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState('date');
@@ -39,6 +35,11 @@ const RiskRatingDetails = () => {
   const [form, setForm] = useState({ country: '', city: '', level: 'Low', description: '', date: '' });
   const [showAlert, setShowAlert] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState(null);
+
+  // Save updates to localStorage
+  useEffect(() => {
+    localStorage.setItem('riskData', JSON.stringify(riskData));
+  }, [riskData]);
 
   // Filtering and sorting
   let filtered = riskData.filter(d =>
@@ -73,10 +74,16 @@ const RiskRatingDetails = () => {
 
   const closeAlert = () => setShowAlert(false);
 
-  // Map country names to risk levels
+  const findCountryData = (mapCountryName) => {
+    if (!mapCountryName) return null;
+    const name = mapCountryName.toLowerCase().trim();
+    return riskData.find(d => d.country.toLowerCase() === name);
+  };
+
   const countryRisk = {};
   riskData.forEach(d => {
-    countryRisk[d.country.toLowerCase()] = d.level;
+    const key = d.country.toLowerCase();
+    countryRisk[key] = d.level;
   });
 
   return (
@@ -153,12 +160,8 @@ const RiskRatingDetails = () => {
                 <td>{row.description}</td>
                 <td>{row.date}</td>
                 <td>
-                  <button className="btn-view" onClick={() => openModal(row)}>
-                    View Details
-                  </button>
-                  <button className="btn-request" onClick={() => requestTravel(row)}>
-                    Request Travel
-                  </button>
+                  <button className="btn-view" onClick={() => openModal(row)}>View Details</button>
+                  <button className="btn-request" onClick={() => requestTravel(row)}>Request Travel</button>
                 </td>
               </tr>
             ))}
@@ -183,14 +186,16 @@ const RiskRatingDetails = () => {
 
       {/* Interactive Map */}
       <div className="map-section">
-        <h3>Interactive Risk Map</h3>
+        <div className="map-header"><h3>🗺️ Interactive Risk Map</h3></div>
+        <div className="map-instructions">
+          <p>Click on any country to view detailed risk assessment and travel advisories</p>
+        </div>
         <div className="map-container">
           <ComposableMap projectionConfig={{ scale: 120 }}>
             <Geographies geography={geoUrl}>
               {({ geographies }) =>
                 geographies.map(geo => {
-                  const rawName = geo.properties && geo.properties.NAME;
-                  const name = (typeof rawName === 'string') ? rawName.toLowerCase() : '';
+                  const name = (geo.properties?.NAME || geo.properties?.name || '').toLowerCase();
                   const risk = countryRisk[name];
                   let fill = '#e0e0e0';
                   if (risk === 'Low') fill = '#4caf50';
@@ -202,13 +207,16 @@ const RiskRatingDetails = () => {
                       geography={geo}
                       fill={fill}
                       stroke="#fff"
-                      style={{
-                        default: { outline: 'none' },
-                        hover: { outline: 'none', cursor: 'pointer', fill: '#999' }
-                      }}
+                      style={{ default: { outline: 'none' }, hover: { outline: 'none', cursor: 'pointer', fill: '#999' } }}
                       onClick={() => {
-                        const found = riskData.find(d => d.country.toLowerCase() === name);
-                        setSelectedCountry(found || { country: geo.properties.NAME, level: 'Unknown', description: 'No data available.' });
+                        const countryName = geo.properties?.NAME || geo.properties?.name || 'Unknown';
+                        const found = findCountryData(countryName);
+                        setSelectedCountry(found || { 
+                          country: countryName, 
+                          level: 'No Data', 
+                          description: 'No risk assessment available for this country yet.',
+                          date: 'N/A'
+                        });
                       }}
                     />
                   );
@@ -224,12 +232,12 @@ const RiskRatingDetails = () => {
         </div>
       </div>
 
-      {/* Detail Modal */}
+      {/* Modals */}
       {modal && (
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>{modal.country} {modal.city && `- ${modal.city}`}</h2>
+              <h2>{modal.country}{modal.city ? ` - ${modal.city}` : ''}</h2>
               <button className="close-btn" onClick={closeModal}>×</button>
             </div>
             <div className="modal-body">
@@ -246,7 +254,6 @@ const RiskRatingDetails = () => {
         </div>
       )}
 
-      {/* Admin Modal */}
       {adminMode && (
         <div className="modal-overlay" onClick={closeAdmin}>
           <form className="modal-content" onClick={e => e.stopPropagation()} onSubmit={saveForm}>
@@ -288,7 +295,6 @@ const RiskRatingDetails = () => {
         </div>
       )}
 
-      {/* High Risk Alert */}
       {showAlert && (
         <div className="modal-overlay" onClick={closeAlert}>
           <div className="modal-content alert-modal" onClick={e => e.stopPropagation()}>
@@ -304,7 +310,6 @@ const RiskRatingDetails = () => {
         </div>
       )}
 
-      {/* Map Popup */}
       {selectedCountry && (
         <div className="modal-overlay" onClick={() => setSelectedCountry(null)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>

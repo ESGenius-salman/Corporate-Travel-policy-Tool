@@ -9,7 +9,10 @@ const {
   updatePolicy,
   deletePolicy,
 } = require("../controllers/policyController");
-const { authMiddleware, roleMiddleware } = require("../middleware/authMiddleware");
+//const { authMiddleware, roleMiddleware } = require("../middleware/authMiddleware");
+const { authMiddleware } = require("../middleware/authMiddleware");
+const roleMiddleware = require("../middleware/roleMiddleware");
+
 
 const router = express.Router();
 // CRUD routes
