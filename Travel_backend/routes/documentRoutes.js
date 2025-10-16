@@ -8,19 +8,19 @@ const {
   updateDocument,
 } = require("../controllers/documentController");
 
-// Multer file upload config
+//  Multer storage configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, "uploads/"),
   filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
+    cb(null, Date.now() + "-" + file.originalname.replace(/\s+/g, "_"));
   },
 });
 
 const upload = multer({ storage });
 
-// Routes
-router.get("/:employeeId", getDocumentsByEmployee);
-router.post("/upload", upload.single("file"), uploadDocument);
-router.put("/:id", updateDocument);
+//  Match frontend routes exactly
+router.get("/:employeeId", getDocumentsByEmployee); // GET /api/documents/1
+router.post("/upload", upload.single("file"), uploadDocument); // POST /api/documents/upload
+router.put("/update/:type", updateDocument); // PUT /api/documents/update/passport
 
 module.exports = router;

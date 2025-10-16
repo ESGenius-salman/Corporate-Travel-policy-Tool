@@ -1,51 +1,63 @@
-﻿const Document = require("../modules/safety/document.model");
+﻿const path = require("path");
+const fs = require("fs");
 
-// GET /api/documents/:employeeId
-exports.getDocumentsByEmployee = async (req, res) => {
-  try {
-    const { employeeId } = req.params;
-    const documents = await Document.findAll({ where: { employeeId } });
-    res.json(documents);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Server error while fetching documents" });
-  }
+let documents = {
+  1: {
+    passport: {
+      type: "passport",
+      number: "A1234567",
+      status: "Valid",
+      expiryDate: "2028-01-01",
+      fileUrl: "/uploads/passport.pdf",
+    },
+    visa: {
+      type: "visa",
+      country: "USA",
+      status: "Approved",
+      expiryDate: "2026-06-01",
+    },
+    healthCertificate: {
+      type: "healthCertificate",
+      fileUrl: "",
+    },
+    additionalDocuments: [],
+  },
 };
 
-// POST /api/documents/upload
-exports.uploadDocument = async (req, res) => {
-  try {
-    const { employeeId, type, status, expiry, details } = req.body;
-
-    const document = await Document.create({
-      employeeId,
-      type,
-      status,
-      expiry,
-      details,
-      fileUrl: req.file ? `/uploads/${req.file.filename}` : null,
-    });
-
-    res.status(201).json({ message: "Document uploaded successfully", document });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to upload document" });
-  }
+// ✅ GET /api/documents/:employeeId
+exports.getDocumentsByEmployee = (req, res) => {
+  const { employeeId } = req.params;
+  res.json(documents[employeeId] || {});
 };
 
-// PUT /api/documents/:id
-exports.updateDocument = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { status, expiry, details } = req.body;
+// ✅ POST /api/documents/upload
+exports.uploadDocument = (req, res) => {
+  const { travelId, type } = req.body;
+  const file = req.file;
+  if (!file) return res.status(400).json({ message: "File is required" });
 
-    const document = await Document.findByPk(id);
-    if (!document) return res.status(404).json({ error: "Document not found" });
+  if (!documents[travelId]) documents[travelId] = {};
+  documents[travelId][type] = {
+    ...documents[travelId][type],
+    fileUrl: `/uploads/${file.filename}`,
+    status: "Uploaded",
+  };
 
-    await document.update({ status, expiry, details });
-    res.json({ message: "Document updated successfully", document });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to update document" });
-  }
+  res.status(200).json({ message: "File uploaded successfully" });
+};
+
+// ✅ PUT /api/documents/update/:type
+exports.updateDocument = (req, res) => {
+  const { type } = req.params;
+  const { travelId, ...updates } = req.body;
+
+  if (!documents[travelId]) return res.status(404).json({ message: "Travel record not found" });
+  if (!documents[travelId][type]) documents[travelId][type] = { type };
+
+  documents[travelId][type] = {
+    ...documents[travelId][type],
+    ...updates,
+  };
+
+  res.json({ message: `${type} updated successfully`, data: documents[travelId][type] });
 };

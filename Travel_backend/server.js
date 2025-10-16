@@ -27,6 +27,8 @@ app.use("/api/approval", require("./routes/approvalRoutes"));
 app.use("/api/safety", require("./routes/safetyRoutes"));
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/documents", require("./routes/documentRoutes")); // Document upload/download API
+app.use("/api/dashboard", require("./routes/dashboardRoutes"));
+
 
 // ✅ New safety modules
 app.use("/api/safety/alerts", require("./routes/alertRoutes"));     // Alerts CRUD

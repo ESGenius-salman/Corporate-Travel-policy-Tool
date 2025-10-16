@@ -6,55 +6,45 @@ import './SafetyCompliance.css';
 const SafetyCompliance = () => {
   const navigate = useNavigate();
 
+  // State for fetched data (even if not yet used)
   const [riskGuidelines, setRiskGuidelines] = useState([]);
   const [emergencyContacts, setEmergencyContacts] = useState([]);
   const [travelInsurances, setTravelInsurances] = useState([]);
   const [documents, setDocuments] = useState([]);
 
-  const travelId = 1; // Replace with actual travelId from auth/user context
-
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [alertsRes, sosRes, checkinRes, documentsRes] = await Promise.all([
-          axios.get('http://localhost:5000/api/safety/alerts'),
-          axios.get('http://localhost:5000/api/safety/sos'),
-          axios.get('http://localhost:5000/api/safety/checkin'),
-          axios.get(`http://localhost:5000/api/documents/${travelId}`),
+        // ✅ Updated to match backend route names
+        const [guidelinesRes, contactsRes, insuranceRes, documentsRes] = await Promise.all([
+          axios.get('http://localhost:5000/api/safety/alerts'),         // risk guidelines → safety alerts
+          axios.get('http://localhost:5000/api/safety/checkin'),        // emergency contacts → check-in
+          axios.get('http://localhost:5000/api/safety/sos'),            // travel insurance → SOS info
+          axios.get('http://localhost:5000/api/documents/1'),           // documents for employeeId = 1
         ]);
 
-        setRiskGuidelines(alertsRes.data);
-        setEmergencyContacts(sosRes.data);
-        setTravelInsurances(checkinRes.data);
-        setDocuments(documentsRes.data);
+        setRiskGuidelines(guidelinesRes.data || []);
+        setEmergencyContacts(contactsRes.data || []);
+        setTravelInsurances(insuranceRes.data || []);
+        setDocuments(Array.isArray(documentsRes.data) ? documentsRes.data : []);
       } catch (err) {
-        console.error(
-          'Error fetching safety data:',
-          err.response?.status,
-          err.message
-        );
+        console.error('Error fetching KPI data:', err);
       }
     };
-
     fetchData();
-  }, [travelId]);
+  }, []);
 
   return (
     <div className="page-container">
       <h1 className="page-title">Safety & Compliance</h1>
-      <p className="page-subtitle">
-        Manage safety and compliance aspects of corporate travel
-      </p>
+      <p className="page-subtitle">Manage safety and compliance aspects of corporate travel</p>
 
       <div className="safety-cards-grid">
-        {/* Risk Rating */}
+        {/* Risk Rating System */}
         <div className="safety-card risk-card">
           <div className="safety-card-icon">📊</div>
           <h2>Risk Rating System</h2>
-          <button
-            className="btn-primary"
-            onClick={() => navigate('/risk-rating-details')}
-          >
+          <button className="btn-primary" onClick={() => navigate('/risk-rating-details')}>
             View Details
           </button>
         </div>
@@ -63,10 +53,7 @@ const SafetyCompliance = () => {
         <div className="safety-card emergency-card">
           <div className="safety-card-icon">🆘</div>
           <h2>Emergency Support</h2>
-          <button
-            className="btn-primary"
-            onClick={() => navigate('/employee/emergency-contacts')}
-          >
+          <button className="btn-primary" onClick={() => navigate('/employee/emergency-contacts')}>
             Manage Contacts
           </button>
         </div>
@@ -75,12 +62,7 @@ const SafetyCompliance = () => {
         <div className="safety-card insurance-card">
           <div className="safety-card-icon">🛡️</div>
           <h2>Travel Insurance</h2>
-          <button
-            className="btn-primary"
-            onClick={() =>
-              navigate('/employee/travel-insurance-verification')
-            }
-          >
+          <button className="btn-primary" onClick={() => navigate('/employee/travel-insurance-verification')}>
             View Insurance
           </button>
         </div>
@@ -89,10 +71,7 @@ const SafetyCompliance = () => {
         <div className="safety-card document-card">
           <div className="safety-card-icon">📄</div>
           <h2>Document Management</h2>
-          <button
-            className="btn-primary"
-            onClick={() => navigate('/employee/document-management')}
-          >
+          <button className="btn-primary" onClick={() => navigate('/employee/document-management')}>
             Manage Documents
           </button>
         </div>
