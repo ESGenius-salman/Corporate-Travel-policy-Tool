@@ -1,40 +1,27 @@
-
 // modules/index.js
 
-/*const safety = {
-    alert: require("./safety/alert.model"),
-    document: require("./safety/document.model")
-};
+// Safety models
+const Alert = require("./safety/alert.model");
+const Document = require("./safety/document.model");
 
-const travel = require("./travel/travel.model");
-const policy = require("./policy/policy.model");
+// Travel models
+const { Trip, Expense } = require("./travel/travel.model");
 
-module.exports = {
-    safety,
-    travel,
-    policy
-};
-*/
-// modules/index.js
+// Policy
+const Policy = require("./policy/policy.model");
 
-// modules/index.js
+// ESG
+const ESGRecord = require("./esg/esg.model"); // adjust path if different
 
-const safety = {
-  alert: require("./safety/alert.model"),
-  document: require("./safety/document.model"),
-};
-
-const travel = require("./travel/travel.model");
-const policy = require("./policy/policy.model");
-//const Users = require("./Users"); // make sure this file exists!
-//const Users = require("./Users.js"); // if the file is Users.js
+// Users
 const Users = require("./User.js");
 
-
-
 module.exports = {
-  safety,
-  travel,
-  policy,
+  Alert,
+  Document,
+  Trip,
+  Expense,
+  Policy,
+  ESGRecord,
   Users,
 };
