@@ -84,9 +84,8 @@ sequelize
   });
   */
 
-
-  require("dotenv").config();
-require("./modules"); // Load all models
+require("dotenv").config();
+require("./modules"); // Load all Sequelize models
 
 const express = require("express");
 const sequelize = require("./config/db");
@@ -95,51 +94,68 @@ const path = require("path");
 
 const app = express();
 
-// Parse JSON
+// =======================
+// Middleware
+// =======================
 app.use(express.json());
-
-// CORS — allow frontend to call backend
 app.use(
   cors({
-    origin: "http://localhost:3000", // React frontend URL
+    origin: "http://localhost:3000", // React frontend
     credentials: true,
   })
 );
 
 // =======================
-// ROUTES
+// Import Routes
+// =======================
+const safetyRoutes = require("./routes/safetyRoutes");
+const alertRoutes = require("./routes/alertRoutes");
+const checkinRoutes = require("./routes/checkinRoutes");
+const sosRoutes = require("./routes/sosRoutes");
+const travelRoutes = require("./routes/travelRoutes");
+const policyRoutes = require("./routes/policyRoutes");
+const approvalRoutes = require("./routes/approvalRoutes");
+const authRoutes = require("./routes/authRoutes");
+const documentRoutes = require("./routes/documentRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes"); // ✅ Added this line
+
+// =======================
+// Mount Routes
 // =======================
 
-// Safety routes
-app.use("/api/safety", require("./routes/safetyRoutes"));
+// Safety
+app.use("/api/safety", safetyRoutes);
+app.use("/api/safety/alerts", alertRoutes);
+app.use("/api/safety/checkin", checkinRoutes);
+app.use("/api/safety/sos", sosRoutes);
 
-// Safety submodules
-app.use("/api/safety/alerts", require("./routes/alertRoutes"));
-app.use("/api/safety/checkin", require("./routes/checkinRoutes"));
-app.use("/api/safety/sos", require("./routes/sosRoutes"));
+// Dashboard
+app.use("/api/dashboard", dashboardRoutes); // ✅ Now properly mounted
 
-// Other routes
-app.use("/api/travel", require("./routes/travelRoutes"));
-app.use("/api/policy", require("./routes/policyRoutes"));
-app.use("/api/approval", require("./routes/approvalRoutes"));
-app.use("/api/auth", require("./routes/authRoutes"));
-app.use("/api/documents", require("./routes/documentRoutes"));
+// Core routes
+app.use("/api/travel", travelRoutes);
+app.use("/api/policy", policyRoutes);
+app.use("/api/approval", approvalRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/documents", documentRoutes);
 
-// Serve static files
+// =======================
+// Static Files
+// =======================
 app.use(express.static(path.join(__dirname, "public")));
 
-// Default route (login page)
+// Default route
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "login.html"));
 });
 
 // =======================
-// START SERVER
+// Start Server
 // =======================
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 5000;
 
 sequelize
-  .sync({ alter: true }) // Keep DB in sync
+  .sync({ alter: true })
   .then(() => {
     console.log("✅ Database connected & synced");
     app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

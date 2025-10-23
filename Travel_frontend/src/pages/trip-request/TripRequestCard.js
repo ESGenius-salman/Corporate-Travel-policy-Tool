@@ -55,11 +55,12 @@ const TripRequestCard = ({ trip }) => {
 
 export default TripRequestCard;*/
 
+//import React from 'react';
 import React from 'react';
 
-const TripRequestCard = ({ trip }) => {
+const TripRequestCard = ({ trip = {} }) => {
   const getStatusColor = (status) => {
-    switch (status) {
+    switch (status?.toLowerCase()) {
       case 'approved': return '#27ae60';
       case 'pending': return '#f39c12';
       case 'rejected': return '#e74c3c';
@@ -68,22 +69,24 @@ const TripRequestCard = ({ trip }) => {
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return isNaN(date) ? 'Invalid Date' : date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
     });
   };
 
   return (
     <div className="trip-card">
       <div className="trip-header">
-        <h3 className="trip-destination">{trip.destination}</h3>
-        <span 
+        <h3 className="trip-destination">{trip.destination || 'Unknown Destination'}</h3>
+        <span
           className="trip-status"
           style={{ backgroundColor: getStatusColor(trip.status) }}
         >
-          {trip.status}
+          {trip.status || 'unknown'}
         </span>
       </div>
 
@@ -97,7 +100,7 @@ const TripRequestCard = ({ trip }) => {
 
         <div className="trip-purpose">
           <span className="purpose-label">Purpose:</span>
-          <p className="purpose-text">{trip.purpose}</p>
+          <p className="purpose-text">{trip.purpose || 'No purpose specified'}</p>
         </div>
 
         <div className="trip-meta">

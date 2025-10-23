@@ -26,7 +26,9 @@ const {
   getAllUsers,
 } = require("../controllers/authController");
 
-const { authMiddleware, roleMiddleware } = require("../middleware/authMiddleware");
+// ✅ FIXED IMPORTS
+const authMiddleware = require("../middleware/authMiddleware");
+const roleMiddleware = require("../middleware/roleMiddleware");
 
 // =======================
 // Auth routes

@@ -27,38 +27,31 @@ const roleMiddleware = (roles) => {
 module.exports = { authMiddleware, roleMiddleware };
 */
 const jwt = require("jsonwebtoken");
+const User = require("../modules/User");
 
-// ✅ Authentication middleware
-const authMiddleware = (req, res, next) => {
-  const token = req.header("Authorization");
-
-  if (!token) {
-    return res.status(401).json({ message: "No token, authorization denied" });
-  }
-
+const authMiddleware = async (req, res, next) => {
   try {
-    const decoded = jwt.verify(token.replace("Bearer ", ""), process.env.JWT_SECRET);
-    req.user = decoded; // decoded should contain { id, role, ... }
+    const token = req.header("Authorization")?.replace("Bearer ", "");
+    if (!token) return res.status(401).json({ message: "No token provided" });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Fetch full user from DB
+    const user = await User.findByPk(decoded.id);
+    if (!user) return res.status(401).json({ message: "Invalid token: user not found" });
+
+    req.user = {
+      id: user.id,
+      name: user.name,
+      role: user.role
+    };
+
     next();
   } catch (err) {
-    console.error("Auth Error:", err);
-    res.status(401).json({ message: "Token is not valid" });
+    console.error("❌ Auth Middleware Error:", err);
+    res.status(401).json({ message: "Invalid or expired token" });
   }
 };
 
-// ✅ Role-based access middleware
-const roleMiddleware = (allowedRoles) => {
-  return (req, res, next) => {
-    if (!req.user || !req.user.role) {
-      return res.status(403).json({ message: "Access denied. Role missing." });
-    }
+module.exports = authMiddleware;
 
-    if (!allowedRoles.includes(req.user.role)) {
-      return res.status(403).json({ message: "Access denied. Insufficient permissions." });
-    }
-
-    next();
-  };
-};
-
-module.exports = { authMiddleware, roleMiddleware };

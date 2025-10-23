@@ -2,17 +2,24 @@ import React, { useState, useEffect } from 'react';
 import TripRequestForm from './TripRequestForm';
 import TripRequestCard from './TripRequestCard';
 import { tripService } from '../../services/tripService';
+import { useAuth } from '../../context/AuthContext';
 import './TripRequest.css';
 
 const TripRequest = () => {
+  const { token } = useAuth(); // ✅ get latest auth token
   const [submittedTrips, setSubmittedTrips] = useState([]);
   const [loadingTrips, setLoadingTrips] = useState(true);
 
   // Fetch trips on mount
   useEffect(() => {
     const fetchTrips = async () => {
+      if (!token) {
+        setLoadingTrips(false);
+        return;
+      }
+
       try {
-        const trips = await tripService.getMyTrips();
+        const trips = await tripService.getMyTrips(token); // pass token
         setSubmittedTrips(trips);
       } catch (error) {
         console.error('Failed to fetch trips:', error);
@@ -21,34 +28,42 @@ const TripRequest = () => {
       }
     };
     fetchTrips();
-  }, []);
+  }, [token]);
 
   // Submit new trip
   const handleTripSubmit = async (tripData) => {
+    if (!token) return { success: false, message: 'You must be logged in' };
+
     try {
-      const newTrip = await tripService.submitTripRequest(tripData);
+      const newTrip = await tripService.submitTripRequest(tripData, token); // pass token
       setSubmittedTrips(prev => [newTrip, ...prev]);
       return { success: true, message: 'Trip request submitted successfully!' };
     } catch (error) {
       console.error('Trip submission failed:', error);
-      return { success: false, message: 'Failed to submit trip request. Please try again.' };
+      const msg =
+        error.response?.status === 403
+          ? 'You are not authorized to submit a trip.'
+          : 'Failed to submit trip request. Please try again.';
+      return { success: false, message: msg };
     }
   };
 
   // Cancel a trip
   const handleCancelTrip = async (tripId) => {
+    if (!token) return;
     try {
-      await tripService.cancelTripRequest(tripId);
+      await tripService.cancelTripRequest(tripId, token);
       setSubmittedTrips(prev => prev.filter(trip => trip.id !== tripId && trip._id !== tripId));
     } catch (error) {
       console.error('Failed to cancel trip:', error);
     }
   };
 
-  // Update a trip (example: update urgency)
+  // Update a trip
   const handleUpdateTrip = async (tripId, updates) => {
+    if (!token) return;
     try {
-      const updatedTrip = await tripService.updateTripRequest(tripId, updates);
+      const updatedTrip = await tripService.updateTripRequest(tripId, updates, token);
       setSubmittedTrips(prev => prev.map(trip => (trip.id === tripId || trip._id === tripId ? updatedTrip : trip)));
     } catch (error) {
       console.error('Failed to update trip:', error);

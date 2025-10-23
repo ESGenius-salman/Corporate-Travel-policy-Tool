@@ -132,21 +132,32 @@ module.exports = {
 };
 */
 // controllers/travelController.js
-const Travel = require("../modules/travel/travel.model");
+const { Travel } = require("../modules");
+const jwt = require("jsonwebtoken");
 
-// Create a new travel request
+// ✅ Create a new travel request
 const createTravelRequest = async (req, res) => {
   try {
-    const { employeeName, destination, purpose, startDate, endDate, budget, urgency, accommodation } = req.body;
+    console.log("📩 Received trip data:", req.body);
+    console.log("👤 Authenticated user:", req.user);
 
-    // Make sure userId comes from the logged-in user
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(400).json({ message: "User ID not found in request" });
+    const { destination, purpose, startDate, endDate, budget, urgency, accommodation } = req.body;
+
+    if (!destination || !purpose || !startDate || !endDate) {
+      console.warn("⚠️ Missing required fields:", { destination, purpose, startDate, endDate });
+      return res.status(400).json({ message: "Missing required fields" });
     }
 
-    // Create travel request
-    const travel = await Travel.create({
+    const userId = req.user?.id;
+    const employeeName = req.user?.name || "Unknown Employee";
+
+    if (!userId) {
+      console.warn("⚠️ Missing userId from token");
+      return res.status(401).json({ message: "Unauthorized: Missing user ID" });
+    }
+
+    const newTrip = await Travel.create({
+      userId,
       employeeName,
       destination,
       purpose,
@@ -155,37 +166,122 @@ const createTravelRequest = async (req, res) => {
       budget,
       urgency,
       accommodation,
-      userId, // assign from logged-in user
+      status: "Pending",
     });
 
-    return res.status(201).json({ message: "Trip request created", travel });
+    res.status(201).json({
+      success: true,
+      message: "Trip request submitted successfully",
+      trip: newTrip,
+    });
   } catch (error) {
-    console.error("Error creating travel request:", error);
-    return res.status(500).json({ message: "Failed to submit trip request", error: error.message });
+    console.error("❌ Error creating travel request:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    });
   }
 };
 
-// Get only logged-in user's travel requests
+
+// ✅ Fetch all trips of the logged-in user
 const getMyTravelRequests = async (req, res) => {
   try {
     const userId = req.user?.id;
-    const travels = await Travel.findAll({ where: { userId } });
-    return res.json(travels);
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized: Missing user ID" });
+    }
+
+    const trips = await Travel.findAll({
+      where: { userId },
+      order: [["createdAt", "DESC"]],
+    });
+
+    // Map trips to include default values for frontend
+    const formattedTrips = trips.map(trip => {
+      const t = trip.toJSON();
+      return {
+        id: t.id,
+        employeeName: t.employeeName || "Unknown Employee",
+        destination: t.destination || "Unknown Destination",
+        purpose: t.purpose || "No purpose specified",
+        startDate: t.startDate || null,
+        endDate: t.endDate || null,
+        budget: t.budget != null ? t.budget : 0,
+        urgency: t.urgency || "N/A",
+        accommodation: t.accommodation || "N/A",
+        status: t.status || "unknown",
+        submittedDate: t.submittedDate || t.createdAt || null,
+        Policy: t.Policy || { name: "N/A" },
+        emergencyContact: t.emergencyContact || "N/A"
+      };
+    });
+
+    res.status(200).json(formattedTrips);
   } catch (error) {
-    console.error("Error fetching travel requests:", error);
-    return res.status(500).json({ message: "Failed to fetch travel requests" });
+    console.error("❌ Error fetching user trips:", error);
+    res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
   }
 };
 
-// Get all travel requests (Admin/Manager)
+module.exports = {
+  getMyTravelRequests,
+};
+// ✅ Admin: Fetch all travel requests
 const getAllTravelRequests = async (req, res) => {
   try {
-    const travels = await Travel.findAll();
-    return res.json(travels);
+    const trips = await Travel.findAll({
+      order: [["createdAt", "DESC"]],
+    });
+
+    res.status(200).json(trips);
   } catch (error) {
-    console.error("Error fetching all travel requests:", error);
-    return res.status(500).json({ message: "Failed to fetch all travel requests" });
+    console.error("❌ Error fetching all travel requests:", error);
+    res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
   }
 };
 
-module.exports = { createTravelRequest, getMyTravelRequests, getAllTravelRequests };
+// ✅ Admin: Update status (Approve / Reject)
+const updateTravelStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!status) {
+      return res.status(400).json({ message: "Status is required" });
+    }
+
+    const trip = await Travel.findByPk(id);
+
+    if (!trip) {
+      return res.status(404).json({ message: "Trip not found" });
+    }
+
+    trip.status = status;
+    await trip.save();
+
+    res.status(200).json({ message: "Trip status updated successfully", trip });
+  } catch (error) {
+    console.error("❌ Error updating travel status:", error);
+    res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+
+// ✅ Export all controllers properly
+module.exports = {
+  createTravelRequest,
+  getMyTravelRequests,
+  getAllTravelRequests,
+  updateTravelStatus,
+};

@@ -37,52 +37,53 @@ const TripRequestForm = ({ onSubmit }) => {
     if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    const validationErrors = validateForm(formData);
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
+  const validationErrors = validateForm(formData);
+  if (Object.keys(validationErrors).length > 0) {
+    setErrors(validationErrors);
+    return;
+  }
+
+  setIsSubmitting(true);
+  setSubmitMessage('');
+
+  try {
+    // ✅ send correct field names
+    const mappedData = {
+      destination: formData.destination,
+      startDate: formData.startDate,
+      endDate: formData.endDate,
+      purpose: formData.purpose,
+      urgency: formData.urgency,
+      budget: formData.budget,
+      accommodation: formData.accommodation
+    };
+
+    const result = await onSubmit(mappedData);
+
+    if (result.success) {
+      setFormData({
+        destination: '',
+        startDate: '',
+        endDate: '',
+        purpose: '',
+        urgency: '',
+        budget: '',
+        accommodation: ''
+      });
+      setSubmitMessage(result.message);
+    } else {
+      setSubmitMessage(result.message);
     }
+  } catch (error) {
+    setSubmitMessage('An error occurred. Please try again.');
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
-    setIsSubmitting(true);
-    setSubmitMessage('');
-
-    try {
-      // Map formData to backend field names
-      const mappedData = {
-        destination: formData.destination,
-        fromDate: formData.startDate,
-        toDate: formData.endDate,
-        purpose: formData.purpose,
-        urgency: formData.urgency,
-        budget: formData.budget,
-        accommodation: formData.accommodation
-      };
-
-      const result = await onSubmit(mappedData);
-
-      if (result.success) {
-        setFormData({
-          destination: '',
-          startDate: '',
-          endDate: '',
-          purpose: '',
-          urgency: '',
-          budget: '',
-          accommodation: ''
-        });
-        setSubmitMessage(result.message);
-      } else {
-        setSubmitMessage(result.message);
-      }
-    } catch (error) {
-      setSubmitMessage('An error occurred. Please try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   return (
     <div className="trip-form-container">

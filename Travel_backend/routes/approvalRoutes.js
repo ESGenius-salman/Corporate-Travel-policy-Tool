@@ -17,21 +17,18 @@ router.get("/all", authMiddleware, roleMiddleware(["admin"]), getAllApprovals);
 module.exports = router;
 */
 
-// routes/approvalRoutes.js
 const express = require("express");
 const router = express.Router();
 
-// ✅ Import controller functions
 const {
   approveRequest,
   getMyApprovals,
-  getAllApprovals
+  getAllApprovals,
 } = require("../controllers/approvalController");
 
-// ✅ Import authentication middleware
-const { authMiddleware, roleMiddleware } = require("../middleware/authMiddleware");
+const authMiddleware = require("../middleware/authMiddleware");
+const roleMiddleware = require("../middleware/roleMiddleware");
 
-// ✅ Route 1: Manager/Admin can approve or reject a request
 router.post(
   "/approve",
   authMiddleware,
@@ -39,7 +36,6 @@ router.post(
   approveRequest
 );
 
-// ✅ Route 2: Manager/Admin can view only their approvals
 router.get(
   "/my",
   authMiddleware,
@@ -47,7 +43,6 @@ router.get(
   getMyApprovals
 );
 
-// ✅ Route 3: Admin can view all approvals
 router.get(
   "/all",
   authMiddleware,

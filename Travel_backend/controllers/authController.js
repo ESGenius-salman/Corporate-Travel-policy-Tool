@@ -77,7 +77,9 @@ exports.getMe = async (req, res) => {
 
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { Users } = require("../modules"); // ✅ modules folder
+//const { Users } = require("../modules"); // ✅ modules folder
+const { User: Users } = require("../modules");
+
 
 // =======================
 // Register user
@@ -154,11 +156,18 @@ const loginUser = async (req, res) => {
     }
 
     // Step 5: Generate token
-    const token = jwt.sign(
+    /*const token = jwt.sign(
       { id: user.id, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
-    );
+    );*/
+    const token = jwt.sign(
+  { id: user.id, role: user.role },
+  process.env.JWT_SECRET,
+  { expiresIn: '7d' } // valid for 7 days
+);
+
+
 
     console.log("🎟️ Token generated successfully");
 

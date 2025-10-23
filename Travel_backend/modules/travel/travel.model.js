@@ -30,9 +30,11 @@ const Travel = sequelize.define("Travel", {
   budget: { type: DataTypes.FLOAT, defaultValue: 0 },
   urgency: { type: DataTypes.STRING },
   accommodation: { type: DataTypes.STRING },
-  //userId: { type: DataTypes.INTEGER, allowNull: false }
-  userId: { type: DataTypes.INTEGER, allowNull: true }
-
+  userId: { type: DataTypes.INTEGER, allowNull: true },
+  status: { type: DataTypes.STRING, defaultValue: "Pending" } // ✅ Add this to match controller
+}, {
+  timestamps: true, // ✅ Add timestamps for createdAt, updatedAt
+  tableName: "travels" // optional, ensures consistent table name
 });
 
 module.exports = Travel;
