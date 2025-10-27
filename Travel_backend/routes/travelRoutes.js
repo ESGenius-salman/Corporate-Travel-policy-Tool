@@ -1,38 +1,23 @@
-// routes/travelRoutes.js
-/*const express = require("express");
+const express = require("express");
+const router = express.Router();
+const { authMiddleware, roleMiddleware } = require("../middleware/authMiddleware");
 const {
   createTravelRequest,
   getMyTravelRequests,
   getAllTravelRequests,
+  updateTravelStatus,
 } = require("../controllers/travelController");
-const { authMiddleware, roleMiddleware } = require("../middleware/authMiddleware");
-
-const router = express.Router();
 
 // Employee submits a new travel request
-router.post("/request", authMiddleware, roleMiddleware(["employee"]), createTravelRequest);
+router.post("/", authMiddleware, roleMiddleware(["employee"]), createTravelRequest);
 
-// Employee views their own travel requests
-router.get("/my-requests", authMiddleware, roleMiddleware(["employee"]), getMyTravelRequests);
+// Employee views their own requests
+router.get("/my", authMiddleware, roleMiddleware(["employee"]), getMyTravelRequests);
 
-// Admin/Manager view all travel requests
-router.get("/all", authMiddleware, roleMiddleware(["admin", "manager"]), getAllTravelRequests);
+// Admin/Manager views all travel requests
+router.get("/", authMiddleware, roleMiddleware(["admin", "manager"]), getAllTravelRequests);
 
-module.exports = router;*/
-
-
-// routes/travelRoutes.js
-const express = require("express");
-const router = express.Router();
-//const { authMiddleware } = require("../middleware/authMiddleware");
-const authMiddleware = require("../middleware/authMiddleware");
-
-const travelController = require("../controllers/travelController");
-
-// Routes
-router.post("/", authMiddleware, travelController.createTravelRequest);
-router.get("/my", authMiddleware, travelController.getMyTravelRequests);
-router.get("/", travelController.getAllTravelRequests);
-router.put("/:id/status", travelController.updateTravelStatus);
+// Admin/Manager updates travel status
+router.put("/:id/status", authMiddleware, roleMiddleware(["admin", "manager"]), updateTravelStatus);
 
 module.exports = router;

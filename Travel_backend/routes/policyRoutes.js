@@ -1,21 +1,23 @@
+// routes/policyRoutes.js
 const express = require("express");
 const router = express.Router();
-const {
-  createPolicy,
-  getPolicies,
-  getPolicyById,
-  updatePolicy,
-  deletePolicy,
-} = require("../controllers/policyController");
 
-const authMiddleware = require("../middleware/authMiddleware");
-const roleMiddleware = require("../middleware/roleMiddleware");
+const { authMiddleware, roleMiddleware } = require("../middleware/authMiddleware");
+const policyController = require("../controllers/policyController");
 
-// CRUD routes
-router.post("/create", authMiddleware, roleMiddleware(["admin"]), createPolicy);
-router.get("/list", authMiddleware, getPolicies);
-router.get("/:id", authMiddleware, getPolicyById);
-router.put("/:id", authMiddleware, roleMiddleware(["admin"]), updatePolicy);
-router.delete("/:id", authMiddleware, roleMiddleware(["admin"]), deletePolicy);
+//  Create a new policy (Admin only)
+router.post("/", authMiddleware, roleMiddleware(["admin"]), policyController.createPolicy);
+
+//  Get all policies
+router.get("/", authMiddleware, policyController.getPolicies);
+
+//  Get single policy by ID
+router.get("/:id", authMiddleware, policyController.getPolicyById);
+
+//  Update policy (Admin only)
+router.put("/:id", authMiddleware, roleMiddleware(["admin"]), policyController.updatePolicy);
+
+//  Delete policy (Admin only)
+router.delete("/:id", authMiddleware, roleMiddleware(["admin"]), policyController.deletePolicy);
 
 module.exports = router;

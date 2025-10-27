@@ -1,5 +1,4 @@
-// routes/authRoutes.js
-const express = require("express");
+﻿const express = require("express");
 const router = express.Router();
 
 const {
@@ -9,9 +8,8 @@ const {
   getAllUsers,
 } = require("../controllers/authController");
 
-// ✅ FIXED IMPORTS
-const authMiddleware = require("../middleware/authMiddleware");
-const roleMiddleware = require("../middleware/roleMiddleware");
+// ✅ Correct imports
+const { authMiddleware, roleMiddleware } = require("../middleware/authMiddleware");
 
 // =======================
 // Auth routes
